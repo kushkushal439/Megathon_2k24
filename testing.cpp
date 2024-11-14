@@ -58,10 +58,10 @@ void printcase(int k) {
 }
 
 struct segtree {
-    typedef int T;
+    typedef unsigned int T;
     // for max segtree, set unit = INT_MIN and f(a,b) = max(a,b)
     static constexpr T unit = 0; // identity for sum
-    T f(T a, T b) { return a + b; } // (any associative fn)
+    T f(T a, T b) { return max(a,b); } // (any associative fn)
     vector<T> s; int n;
     segtree(int n = 0, T def = unit) : s(2 * n, def), n(n) {}
     void update(int pos, T val) {
@@ -92,7 +92,9 @@ void solve() {
     while(q--) {
         int l,r;
         cin >> l >> r;
-        cout << st.query(l,r+1) << endl;
+        l++;
+        r--;
+        cout << st.query(l,r) << endl;
     }
 }
 
