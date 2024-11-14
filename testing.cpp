@@ -102,10 +102,7 @@ void solve() {
     cin >> n;
     vi v;
     scan(n,v);
-    vi pref(n+1,0);
-    // fr(i,0,n) {
-    //     st.update(i,v[i]);
-    // }
+    vi pref(n+3,0);
     int q;
     cin >> q;
     while(q--) {
