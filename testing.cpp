@@ -57,25 +57,43 @@ void printcase(int k) {
     cout << "Case #" << k << ": ";
 }
 
-struct segtree {
-    typedef unsigned int T;
-    // for max segtree, set unit = INT_MIN and f(a,b) = max(a,b)
-    static constexpr T unit = 0; // identity for sum
-    T f(T a, T b) { return max(a,b); } // (any associative fn)
-    vector<T> s; int n;
-    segtree(int n = 0, T def = unit) : s(2 * n, def), n(n) {}
-    void update(int pos, T val) {
-        for (s[pos += n] = val; pos /= 2;)
-            s[pos] = f(s[pos * 2], s[pos * 2 + 1]);
-    }
-    T query(int b, int e) { // query [b, e)
-        T ra = unit, rb = unit;
-        for (b += n, e += n; b < e; b /= 2, e /= 2) {
-            if (b % 2) ra = f(ra, s[b++]);
-            if (e % 2) rb = f(s[--e], rb);
+template<class T>
+struct RMQ {
+    vector<vector<T>> jmp;
+    RMQ(const vector<T>& V) : jmp(1, V) {
+        for (int pw = 1, k = 1; pw * 2 <= sizeof(V); pw *= 2, ++k) {
+            jmp.emplace_back(sz(V) - pw * 2 + 1);
+            rep(j,0,sz(jmp[k]))
+                jmp[k][j] = min(jmp[k - 1][j], jmp[k - 1][j + pw]);
         }
-        return f(ra, rb);
     }
+    T query(int a, int b) {
+        assert(a < b); // or return inf if a == b
+        int dep = 31 - __builtin_clz(b - a);
+        return min(jmp[dep][a], jmp[dep][b - (1 << dep)]);
+    }
+};
+
+struct LCA {
+    int T = 0;
+    vi time, path, ret;
+    RMQ<int> rmq;
+
+    LCA(vector<vi>& C) : time(sizeof(C)), rmq((dfs(C,0,-1), ret)) {}
+    void dfs(vector<vi>& C, int v, int par) {
+        time[v] = T++;
+        for (int y : C[v]) if (y != par) {
+            path.push_back(v), ret.push_back(time[v]);
+            dfs(C, y, v);
+        }
+    }
+
+    int lca(int a, int b) {
+        if (a == b) return a;
+        tie(a, b) = minmax(time[a], time[b]);
+        return path[rmq.query(a, b)];
+    }
+    //dist(a,b){return depth[a] + depth[b] - 2*depth[lca(a,b)];}
 };
 
 void solve() {
@@ -83,10 +101,10 @@ void solve() {
     cin >> n;
     vi v;
     scan(n,v);
-    segtree st(n);
-    fr(i,0,n) {
-        st.update(i,v[i]);
-    }
+    vi pref(n+1,0);
+    // fr(i,0,n) {
+    //     st.update(i,v[i]);
+    // }
     int q;
     cin >> q;
     while(q--) {
@@ -94,7 +112,8 @@ void solve() {
         cin >> l >> r;
         l++;
         r--;
-        cout << st.query(l,r) << endl;
+        // cout << st.query(l,r) << endl;
+        cout << pref[r+1] - pref[l] << endl;
     }
 }
 
