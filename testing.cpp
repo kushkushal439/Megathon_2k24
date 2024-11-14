@@ -54,7 +54,8 @@ vi divisors(int n) {
 }
 
 void printcase(int k) {
-    cout << "Case #" << k << ": ";
+    cout << "Case #" << k << ":: ";
+    cout << endl;
 }
 
 template<class T>
