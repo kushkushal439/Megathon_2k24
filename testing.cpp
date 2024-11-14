@@ -44,7 +44,7 @@ vi divisors(int n) {
     for(int i=1; i<=sqrt(n); i++) {
         if (n%i == 0) {
             if (n/i == i) v.pb(i);
-            else {
+            else if (n/i != i) {
                 v.pb(i);
                 v.pb(n/i);
             }
